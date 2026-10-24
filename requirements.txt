@@ -1,0 +1,7 @@
+mesa>=3.3,<4
+solara>=1.40,<2
+anywidget>=0.9,<1
+networkx>=3
+numpy>=1.26
+pandas>=2
+matplotlib>=3.7
