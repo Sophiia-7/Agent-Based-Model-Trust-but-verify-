@@ -1,5 +1,5 @@
-"""Рисунок сети: состояния студентов в начале, в конце проверок и в конце прогона
-для контрольного сценария и сценария с проверками на одной и той же популяции (seed = 0)."""
+"""Network visualization: student states at the beginning, at the end of the verification period, and at the end of the simulation run
+for the control scenario and the scenario with verification, using the same population (seed = 0)."""
 import numpy as np
 import networkx as nx
 import matplotlib
@@ -10,7 +10,7 @@ from model import params, init_population, step, SCENARIOS
 
 SEED = 0
 COLORS = {-1: "#6250d6", 0: "#1baf7a", 1: "#eb6834"}
-LABELS = {-1: "−1: не доверяет", 0: "0: доверяет и проверяет", 1: "+1: доверяет без проверки"}
+LABELS = {-1: "−1: does not trust", 0: "0: trusts and verifies", 1: "+1: trusts without verification"}
 
 
 def snapshots(scenario, snap):
@@ -29,7 +29,7 @@ def snapshots(scenario, snap):
 if __name__ == "__main__":
     p0 = params()
     SNAP = (0, p0["t_off"], p0["T"])
-    pop, _ = snapshots("0. Контроль", SNAP)
+    pop, _ = snapshots("0. Control", SNAP)
     G = pop["G"]
     pos = {}
     for g in range(p0["N_groups"]):
@@ -41,7 +41,7 @@ if __name__ == "__main__":
             pos[n] = (cx + sub[n][0], cy + sub[n][1])
 
     fig, axes = plt.subplots(2, 3, figsize=(11, 7.2))
-    titles = {0: "t = 0 (начало)", SNAP[1]: f"t = {SNAP[1]} (конец проверок)", SNAP[2]: f"t = {SNAP[2]} (конец прогона)"}
+    titles = {0: "t = 0 (Start)", SNAP[1]: f"t = {SNAP[1]} (End of verification period)", SNAP[2]: f"t = {SNAP[2]} (End of simulation run)"}
     for row, scen in enumerate(SCENARIOS):
         _, snaps = snapshots(scen, SNAP)
         for col, t in enumerate(SNAP):
@@ -54,8 +54,8 @@ if __name__ == "__main__":
             ax.axis("off")
     handles = [Line2D([0], [0], marker="o", ls="", color=COLORS[s], label=LABELS[s], ms=7) for s in (-1, 0, 1)]
     fig.legend(handles=handles, loc="lower center", ncol=3, frameon=False, fontsize=9)
-    fig.suptitle("Сеть учебных групп: 6 групп по 25 студентов, одна и та же популяция в двух сценариях",
+    fig.suptitle("Network of study groups: 6 groups of 25 students, with the same population in both scenarios.",
                  fontsize=10, x=0.01, ha="left")
     fig.tight_layout(rect=(0, 0.05, 1, 0.97))
     fig.savefig("out/network.png", dpi=150)
-    print("готово: out/network.png")
+    print("Done: out/network.png")
