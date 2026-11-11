@@ -1,10 +1,10 @@
-# Доверяй, но проверяй — интерактивная Mesa-модель 
+# Trust, but Verify — An Interactive Mesa Model
 
-Приложение использует Mesa + Solara.
+The application uses Mesa + Solara.
 
-## Запуск в PyCharm
+## Running in PyCharm
 
-Открыть встроенный Terminal в папке проекта, где лежат `app.py`, `mesa_model.py`, `model.py`, `dashboard.js` и `dashboard.css`.
+Open the built-in Terminal in the project directory containing `app.py`, `mesa_model.py`, `model.py`, `dashboard.js`, and `dashboard.css`.
 
 ```bash
 /Library/Frameworks/Python.framework/Versions/3.13/bin/python3.13 -m venv .venv
@@ -14,51 +14,47 @@ python run_all.py 200
 solara run app.py
 ```
 
-Открыть ссылку из терминала, обычно http://localhost:8765.
+Open the link shown in the terminal, usually http://localhost:8765.
 
-## Управление
+## Controls
 
-- **Пуск** — автоматически переходить от одного раунда к следующему, пока не будет достигнут конец симуляции.
-- **Пауза** — остановить автопрогон на текущем раунде.
-- **Шаг +1** и **Шаг +10** — ручной просмотр.
-- **Сброс** — начать сначала (с выбранными параметрами).
-- **Скорость** — пауза между последовательными раундами в миллисекундах.
+- **Start** — automatically advance from one round to the next until the simulation ends.
+- **Pause** — stop automatic execution at the current round.
+- **Step +1** and **Step +10** — advance manually.
+- **Reset** — start over (with the selected parameters).
+- **Speed** — the pause between consecutive rounds, in milliseconds.
 
-Сценарии: **0 · Контроль** (без проверок) и **1 · Преподаватель** (проверки в раунды t_on–t_off).
-Смена сценария сразу начинает новую симуляцию. Изменения остальных параметров применяются при «Применить», «Сброс» или новом запуске.
+Scenarios: **0 · Control** (no checks) and **1 · Teacher** (checks during rounds t_on–t_off).
+Changing the scenario immediately starts a new simulation. Changes to other parameters take effect when you click “Apply” or “Reset,” or start a new run.
 
-Параметры в панели:
-- **Параметры:** e (ошибка ИИ), r (покрытие), σ (строгость), a, b, γ и λ (средние индивидуальных значений), s (средний уровень студентов), β (общение), p_out (дружба между группами).
-- **Время и сеть:** T, t_on, t_off (согласуются автоматически: 0 ≤ t_on < t_off ≤ T), число групп, размер группы, seed.
+Parameters in the panel:
+- **Parameters:** e (AI error), r (coverage), σ (strictness), a, b, γ, and λ (means of individual values), s (average student level), β (communication), p_out (friendships between groups).
+- **Time and network:** T, t_on, t_off (automatically constrained to satisfy 0 ≤ t_on < t_off ≤ T), number of groups, group size, seed.
 
-## Ансамбль прогонов в приложении
+## Ensemble of Runs in the Application
 
-После «Применить», «Сброс» или смены сценария приложение автоматически (галочка в «Управлении моделью»)
-прогоняет модель R раз с текущими параметрами (ползунок «Ансамбль», по умолчанию 40; около 3 с) и обновляет:
-- полосы ансамбля и сводную таблицу;
-- точки симуляции на графике H1 (по сетке e, R/4 прогонов на точку, усы — 95% прогонов и бутстрап-интервал);
-- проценты на теплокарте H2 (симуляция, R/4 прогонов на клетку, ± — полуширина бутстрап-интервала).
-Кнопка «↻ Пересчитать ансамбль» запускает пересчёт вручную (например, с бо́льшим R).
-Ансамбль считается быстрой NumPy-версией модели (`model.py`), логика которой совпадает с Mesa-версией.
+After clicking “Apply” or “Reset,” or changing the scenario, the application automatically (if the checkbox under “Model Controls” is selected) runs the model R times with the current parameters (the “Ensemble” slider; 40 by default; approximately 3 seconds) and updates:
+- the ensemble bands and summary table;
+- the simulation points on the H1 plot (over a grid of e values, R/4 runs per point; error bars show the interval covering 95% of runs and the bootstrap interval);
+- the percentages on the H2 heatmap (simulation, R/4 runs per cell; ± indicates the half-width of the bootstrap interval).
 
-## Разброс прогонов («бутстрап») в экспериментах
+The “↻ Recalculate Ensemble” button triggers recalculation manually (for example, with a larger R).
+The ensemble is computed using the fast NumPy version of the model (`model.py`), whose logic matches that of the Mesa version.
 
-`experiments.py` сохраняет метрики каждого прогона всех экспериментов (`out/data/all_runs.csv`) и сводку
-(`out/data/bootstrap_summary.csv`): среднее, sd между прогонами, интервал 95% прогонов и 95% бутстрап-интервал
-среднего (1000 ресэмплов). Эксперимент B (`B_convergence.csv`, `B_variance.csv`, рисунок `B_bootstrap.png`):
-сходимость среднего с ростом числа прогонов и разложение разброса на «между популяциями» (сеть,
-характеристики, начальные состояния) и «внутри популяции» (случайность оценок и общения).
+## Variation Across Runs (“Bootstrap”) in Experiments
 
-Серое окно на графиках присутствует только в сценарии с проверками.
+`experiments.py` saves the metrics for every run of all experiments (`out/data/all_runs.csv`) and a summary (`out/data/bootstrap_summary.csv`): the mean, standard deviation (SD) across runs, the interval covering 95% of runs, and the 95% bootstrap confidence interval for the mean (1,000 resamples). Experiment B (`B_convergence.csv`, `B_variance.csv`, figure `B_bootstrap.png`) examines the convergence of the mean as the number of runs increases and decomposes variability into “between-population” variation (network, characteristics, initial states) and “within-population” variation (randomness in evaluations and communication).
 
-## Архитектура
+The gray shaded region appears on the plots only in the scenario with checks.
 
-- `model.py` — основная векторизованная модель варианта 3 и параметры (BASE, SCENARIOS), среднеполевые расчёты.
-- `mesa_model.py` — та же модель в архитектуре Mesa (Student, TrustModel; методы доступа к состояниям, долям по группам и фиксированной раскладке).
-- `ensemble.py` — ансамбли прогонов и бутстрап (используется экспериментами и приложением).
-- `app.py` — мост Python → браузер: изменяет состояние модели по команде интерфейса, считает графики гипотез при сбросе, один раз передаёт рисунки экспериментов.
-- `dashboard.js` — панель управления и отрисовка сети и графиков на Canvas.
-- `dashboard.css` — внешний вид интерфейса.
-- `experiments.py`, `figures.py`, `network_viz.py`, `run_all.py` — эксперименты и рисунки.
+## Architecture
 
-Все изменения выполняются через Python-экземпляр `TrustModel`. JavaScript отвечает только за отображение и последовательную отправку команд при автопрогоне. Каждый следующий шаг начинается только после подтверждения предыдущего, без параллельных вызовов модели.
+- `model.py` — the main vectorized model for Variant 3 and its parameters (BASE, SCENARIOS), plus mean-field calculations.
+- `mesa_model.py` — the same model implemented using the Mesa architecture (Student, TrustModel; methods for accessing states, group proportions, and the fixed layout).
+- `ensemble.py` — ensembles of runs and bootstrapping (used by the experiments and the application).
+- `app.py` — the Python → browser bridge: updates the model state in response to interface commands, computes the hypothesis plots on reset, and sends the experiment figures once.
+- `dashboard.js` — the control panel and rendering of the network and plots on Canvas.
+- `dashboard.css` — the interface styling.
+- `experiments.py`, `figures.py`, `network_viz.py`, `run_all.py` — experiments and figures.
+
+All state changes are performed through the Python `TrustModel` instance. JavaScript is responsible only for rendering and sequentially sending commands during automatic execution. Each subsequent step begins only after the previous one has been acknowledged, with no parallel calls to the model.
