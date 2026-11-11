@@ -1,11 +1,12 @@
 """
-Mesa-реализация модели «Доверяй, но проверяй».
+Mesa implementation of the "Trust, but Verify" model.
 
-Логика та же, что в model.py:
-  - состояния -1 / 0 / +1; индивидуальные характеристики s, c, gamma, lam;
-  - проверки преподавателя (покрытие r, строгость sigma) только в раунды [t_on, t_off);
-  - влияние друга: шаг на одну позицию к случайному соседу с вероятностью beta·c;
-  - один раунд = одно синхронное обновление по снимку S(t) (фазы step / advance).
+The logic is the same as in model.py:
+  - states -1 / 0 / +1; individual characteristics s, c, gamma, lam;
+  - teacher verification (coverage r, strictness sigma) only during rounds [t_on, t_off);
+  - peer influence: one-step movement toward a randomly selected neighbor's state
+    with probability beta·c;
+  - one round = one synchronous update based on the snapshot S(t) (step / advance phases).
 """
 import networkx as nx
 import numpy as np
@@ -15,7 +16,7 @@ from mesa.datacollection import DataCollector
 
 from model import BASE, SCENARIOS
 
-DEFAULT_SCENARIO = "1. Преподаватель"
+DEFAULT_SCENARIO = "1. Teacher"
 INT_KEYS = ("T", "t_on", "t_off", "N_groups", "group_size")
 
 
@@ -143,7 +144,7 @@ class TrustModel(mesa.Model):
         return states.count(s) / len(states)
 
     def group_shares(self, s=0):
-        """Доля студентов в состоянии s в каждой учебной группе."""
+        """Proportion of students in state s within each study group."""
         counts = np.zeros(self.p["N_groups"])
         for a in self.agents:
             counts[a.group] += a.state == s
