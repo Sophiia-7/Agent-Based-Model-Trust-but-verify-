@@ -1,19 +1,21 @@
 """
-Вычислительные эксперименты.
+Computational experiments.
 
-  E1 — контроль vs преподаватель: траектории, доли по группам, устойчивость (RQ, H3);
-  H1 — ошибка ИИ e × строгость σ ∈ {1, 0.5};
-  H2 — покрытие r × строгость σ; плюс длинные прогоны (скорость vs итог);
-  H3 — устойчивость после окончания проверок при разной силе общения β;
-  S  — чувствительность к параметрам (±50%);
-  B  — разброс между прогонами с одинаковыми параметрами («бутстрап»):
-       сходимость среднего с ростом R и разложение разброса на «популяцию» и «динамику».
+  E1 — control vs teacher: trajectories, group-level proportions, persistence (RQ, H3);
+  H1 — AI error rate e × strictness σ ∈ {1, 0.5};
+  H2 — coverage r × strictness σ; plus long runs (speed vs final outcome);
+  H3 — persistence after verification ends at different levels of communication strength β;
+  S  — sensitivity to parameters (±50%);
+  B  — variation across runs with identical parameters ("bootstrap"):
+       convergence of the mean as R increases and decomposition of variation
+       into "population" and "dynamics".
 
-Для ВСЕХ экспериментов сохраняются метрики каждого прогона (out/data/all_runs.csv)
-и сводка по ним (out/data/bootstrap_summary.csv): среднее, sd между прогонами,
-95% интервал отдельных прогонов и 95% бутстрап-интервал среднего.
+For ALL experiments, metrics from each individual run are saved (out/data/all_runs.csv),
+along with their summary (out/data/bootstrap_summary.csv): mean, standard deviation
+across runs, 95% interval of individual runs, and 95% bootstrap confidence interval
+for the mean.
 
-Запуск:  python3 experiments.py [R]     (R — прогонов на сценарий, по умолчанию 200)
+Run: python3 experiments.py [R]     (R — runs per scenario, default 200)
 """
 import os
 import sys
@@ -29,7 +31,7 @@ METRICS = ["M_during", "H_during", "L_during", "M_after", "H_after", "L_after",
 
 
 def many(over, R, experiment, condition, seed0=0):
-    """R прогонов + запись метрик каждого прогона в общий журнал."""
+    """R runs + recording the metrics of each run in a shared log."""
     hs, gs, ms, cs = simulate(over, R, seed0)
     rec = ms.copy()
     rec.insert(0, "seed", range(seed0, seed0 + R))
@@ -55,7 +57,7 @@ def e1(R):
         for col in cs.columns:
             row["n_" + col] = cs[col].mean()
         rows.append(row)
-    keep["meanfield"] = meanfield_traj(SCENARIOS["1. Преподаватель"])
+    keep["meanfield"] = meanfield_traj(SCENARIOS["1. Teacher"])
     pd.DataFrame(rows).to_csv(f"{DATA}/E1_scenarios.csv", index=False)
     np.savez_compressed(f"{DATA}/E1_traj.npz", names=np.array(list(SCENARIOS)), **keep)
 
@@ -118,8 +120,8 @@ def h3(R):
 
 
 def sensitivity(R):
-    teach = SCENARIOS["1. Преподаватель"]
-    _, _, ms0, _ = many(teach, R, "S", "база")
+    teach = SCENARIOS["1. Teacher"]
+    _, _, ms0, _ = many(teach, R, "S", "baseline")
     base = ms0.M_during.mean()
     rows = []
     for par in ["a", "b", "gamma", "lam", "beta", "s"]:
@@ -138,11 +140,13 @@ def sensitivity(R):
 
 
 def variability(R_conv=500, n_pop=20, n_dyn=20):
-    """B. Разброс между прогонами с одинаковыми параметрами.
-    (1) Сходимость: как среднее и его бутстрап-интервал меняются с ростом числа прогонов R.
-    (2) Разложение: n_pop популяций (сеть + характеристики + начальные состояния)
-        × n_dyn повторов динамики на каждой. Доля разброса «между популяциями»
-        и «внутри популяции» (одинаковая сеть, разные случайности оценок и общения)."""
+    """B. Variation across runs with identical parameters.
+    (1) Convergence: how the mean and its bootstrap confidence interval change
+        as the number of runs R increases.
+    (2) Decomposition: n_pop populations (network + characteristics + initial states)
+        × n_dyn repetitions of the dynamics for each population. The share of
+        variation "between populations" and "within populations"
+        (same network, different randomness in assessments and communication)."""
     conv, keep = [], {}
     for name, sc in SCENARIOS.items():
         _, _, ms, _ = many(sc, R_conv, "B", f"сходимость, {name}", seed0=10000)
@@ -170,7 +174,7 @@ def variability(R_conv=500, n_pop=20, n_dyn=20):
         rows.append(dict(scenario=name, mean=Y.mean(), sd_total=np.sqrt(total),
                          sd_within_population=np.sqrt(within), sd_between_populations=np.sqrt(between),
                          share_between=between / (between + within) if between + within > 0 else 0.0))
-        rec = pd.DataFrame(dict(experiment="B", condition=f"разложение, {name}",
+        rec = pd.DataFrame(dict(experiment="B", condition=f"decomposition, {name}",
                                 seed=np.tile(np.arange(n_dyn), n_pop),
                                 pop_seed=np.repeat(np.arange(n_pop), n_dyn), M_during=Y.ravel()))
         ALL_RUNS.append(rec)
@@ -178,8 +182,9 @@ def variability(R_conv=500, n_pop=20, n_dyn=20):
 
 
 def bootstrap_summary():
-    """Сводка по всем экспериментам: для каждого условия и метрики - среднее, sd между
-    прогонами, 95% интервал прогонов и 95% бутстрап-интервал среднего."""
+    """Summary across all experiments: for each condition and metric — mean,
+    standard deviation across runs, 95% interval of individual runs,
+    and 95% bootstrap confidence interval for the mean."""
     allr = pd.concat(ALL_RUNS, ignore_index=True)
     allr.to_csv(f"{DATA}/all_runs.csv", index=False)
     rows = []
@@ -201,11 +206,11 @@ if __name__ == "__main__":
                     ("H3", lambda: h3(R_grid)), ("S", lambda: sensitivity(R_grid)),
                     ("B", lambda: variability(R_conv=max(R, 100) * 5 // 2))]:
         f()
-        print(f"готово: {name}")
+        print(f"Done: {name}")
     s = bootstrap_summary()
     print(f"\nВсего прогонов: {sum(len(x) for x in ALL_RUNS)}")
     pd.set_option("display.width", 200)
     for fn in ("E1_scenarios.csv", "B_convergence.csv", "B_variance.csv", "S_sensitivity.csv"):
         print(f"\n===== {fn} =====\n{pd.read_csv(f'{DATA}/{fn}').round(3).to_string()}")
-    print("\n===== bootstrap_summary (M_during, по экспериментам) =====")
+    print("\n===== bootstrap_summary (M_during, by experiment) =====")
     print(s[s.metric == "M_during"].groupby("experiment")[["sd", "ci_halfwidth"]].describe().round(3).to_string())
