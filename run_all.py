@@ -1,5 +1,5 @@
-"""Полный воспроизводимый запуск: эксперименты -> рисунки -> рисунок сети.
-Запуск:  python3 run_all.py [R]    (по умолчанию R = 200)"""
+"""Full reproducible run: experiments -> figures -> network visualization.
+Run: python3 run_all.py [R]    (default: R = 200)"""
 import subprocess
 import sys
 
