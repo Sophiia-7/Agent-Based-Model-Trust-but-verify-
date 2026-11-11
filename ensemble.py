@@ -1,15 +1,17 @@
 """
-Ансамбли прогонов и бутстрап: насколько меняется результат, если много раз прогнать
-модель с одними и теми же параметрами.
+Ensembles of simulation runs and bootstrap: how much the results vary when the
+model is run repeatedly with the same parameters.
 
-Для каждой величины считаются:
-  mean           — среднее по R прогонам;
-  sd             — стандартное отклонение между прогонами (разброс одного прогона);
-  run_lo, run_hi — 2.5% и 97.5% перцентили прогонов: куда попадает 95% отдельных прогонов;
-  ci_lo, ci_hi   — 95% бутстрап-интервал СРЕДНЕГО (B ресэмплов прогонов с возвращением):
-                   насколько точно оценено среднее при данном R.
+For each quantity, the following are calculated:
+  mean           — mean across R runs;
+  sd             — standard deviation across runs (variation in individual runs);
+  run_lo, run_hi — 2.5th and 97.5th percentiles of the runs: the range containing
+                   95% of individual runs;
+  ci_lo, ci_hi   — 95% bootstrap confidence interval for the MEAN
+                   (B resamples of runs with replacement):
+                   how precisely the mean is estimated for a given R.
 
-Модуль используют experiments.py и app.py.
+This module is used by experiments.py and app.py.
 """
 import time
 import numpy as np
@@ -20,7 +22,7 @@ B_DEFAULT = 1000
 
 
 def boot_mean(x, B=B_DEFAULT, seed=0):
-    """Бутстрап-распределение среднего по оси 0"""
+    """Bootstrap distribution of the mean along axis 0."""
     x = np.asarray(x, dtype=float)
     rng = np.random.default_rng(seed)
     idx = rng.integers(0, x.shape[0], size=(B, x.shape[0]))
@@ -42,8 +44,9 @@ def summarize(x, B=B_DEFAULT, seed=0):
 
 
 def simulate(over, R, seed0=0):
-    """R прогонов с зернами seed0..seed0+R-1 (одни и те же популяции для всех условий).
-    Возвращает траектории (R, T+1, 3), доли M по группам (R, T+1, k), метрики и счетчики."""
+    """R runs with seeds seed0..seed0+R-1 (the same populations for all conditions).
+    Returns trajectories (R, T+1, 3), proportions of M by group (R, T+1, k),
+    metrics, and counters."""
     hs, gs, ms, cs = [], [], [], []
     for s in range(seed0, seed0 + R):
         h, c, g = run(over, seed=s, groups=True)
@@ -52,18 +55,18 @@ def simulate(over, R, seed0=0):
 
 
 def traj_bands(y, B=B_DEFAULT):
-    """Полосы для траектории y: (R, T+1)."""
+    """Bands for trajectory y: (R, T+1)."""
     lo, hi = boot_ci(y, B)
     return dict(mean=y.mean(0).tolist(), ci_lo=lo.tolist(), ci_hi=hi.tolist(),
                 run_lo=np.percentile(y, 2.5, 0).tolist(), run_hi=np.percentile(y, 97.5, 0).tolist())
 
 METRIC_LABELS = {
-    "M_during": "M в конце проверок",
-    "M_after": "M в конце модели",
-    "H_during": "H в конце проверок",
-    "Persist": "Изменение M после проверок (H3)",
-    "sd_groups_off": "Разброс групп в конце проверок",
-    "sd_groups_end": "Разброс групп в конце модели",
+    "M_during": "M at the end of verification",
+    "M_after": "M at the end of the simulation",
+    "H_during": "H at the end of verification",
+    "Persist": "Change in M after verification (H3)",
+    "sd_groups_off": "Variation between groups at the end of verification",
+    "sd_groups_end": "Variation between groups at the end of the simulation",
 }
 H1_E = (0.05, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9)
 H2_R = (0.05, 0.1, 0.2, 0.3, 0.5)
@@ -71,11 +74,14 @@ H2_SIGMA = (0.1, 0.25, 0.5, 0.75, 1.0)
 
 
 def app_ensemble(p, scenario_name, R=40, B=500):
-    """Ансамбль для текущих параметров приложения:
-    - контроль и проверки: полосы M(t), сводка метрик с бутстрапом;
-    - траектории M всех прогонов текущего сценария (чтобы найти место текущего прогона);
-    - H1: M в конце проверок по сетке e (симуляция, R_h прогонов на точку);
-    - H2: M в конце проверок по сетке r × σ (симуляция, R_h прогонов на клетку)."""
+    """Ensemble for the current application parameters:
+    - control and verification scenarios: M(t) bands, summary of metrics with bootstrap;
+    - M trajectories of all runs in the current scenario (to determine the position
+      of the current run);
+    - H1: M at the end of verification across a grid of e values
+      (simulation, R_h runs per point);
+    - H2: M at the end of verification across a grid of r × σ values
+      (simulation, R_h runs per cell)."""
     t0 = time.time()
     p = params(**p)
     base = {k: v for k, v in p.items() if k != "teacher"}
@@ -95,7 +101,7 @@ def app_ensemble(p, scenario_name, R=40, B=500):
             out["summary"].append(dict(scenario=name, metric=label, **summarize(ms[key], B)))
     out["runsM"] = runsM
 
-    teach = {**base, **SCENARIOS["1. Преподаватель"]}
+    teach = {**base, **SCENARIOS["1. Teacher"]}
     h1 = dict(e=list(H1_E), mean=[], ci_lo=[], ci_hi=[], run_lo=[], run_hi=[])
     for e in H1_E:
         _, _, ms, _ = simulate({**teach, "e": e}, R_h, seed0=1000)
