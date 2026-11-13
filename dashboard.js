@@ -1,25 +1,26 @@
+
 const palette = { "-1": "#7467df", "0": "#159b83", "1": "#ed9257" };
 const accent = { strict: "#2f6fb0", band: "rgba(145, 152, 171, 0.14)", grid: "#edf0f5", axis: "#8a93a5" };
 
 const parameters = [
-  {name: "e", label: "Вероятность ошибки ИИ", symbol: "e", min: 0, max: 1, step: 0.05, value: 0.45},
-  {name: "r", label: "Покрытие проверками", symbol: "r", min: 0, max: 0.5, step: 0.05, value: 0.2},
-  {name: "sigma", label: "Строгость проверки", symbol: "σ", min: 0, max: 1, step: 0.05, value: 1.0},
-  {name: "a", label: "Скептик пробует ИИ", symbol: "a", min: 0, max: 1, step: 0.05, value: 0.4},
-  {name: "b", label: "Начинает проверять", symbol: "b", min: 0, max: 1, step: 0.05, value: 0.6},
-  {name: "gamma", label: "Успех расслабляет (ср.)", symbol: "γ", min: 0, max: 0.5, step: 0.05, value: 0.15},
-  {name: "lam", label: "Разочарование (ср.)", symbol: "λ", min: 0, max: 0.5, step: 0.05, value: 0.3},
-  {name: "s", label: "Уровень студентов (ср.)", symbol: "s", min: 0.35, max: 0.65, step: 0.05, value: 0.65},
-  {name: "beta", label: "Интенсивность общения", symbol: "β", min: 0, max: 1, step: 0.05, value: 0.5},
-  {name: "p_out", label: "Дружба между группами", symbol: "p_out", min: 0, max: 0.1, step: 0.005, value: 0.01, digits: 3},
+  {name: "e", label: "AI error probability", symbol: "e", min: 0, max: 1, step: 0.05, value: 0.45},
+  {name: "r", label: "Verification coverage", symbol: "r", min: 0, max: 0.5, step: 0.05, value: 0.2},
+  {name: "sigma", label: "Verification strictness", symbol: "σ", min: 0, max: 1, step: 0.05, value: 1.0},
+  {name: "a", label: "Skeptic tries AI", symbol: "a", min: 0, max: 1, step: 0.05, value: 0.4},
+  {name: "b", label: "Starts verifying", symbol: "b", min: 0, max: 1, step: 0.05, value: 0.6},
+  {name: "gamma", label: "Tendency to relax after success (mean)", symbol: "γ", min: 0, max: 0.5, step: 0.05, value: 0.15},
+  {name: "lam", label: "Sensitivity to AI failure (mean)", symbol: "λ", min: 0, max: 0.5, step: 0.05, value: 0.3},
+  {name: "s", label: "Student ability level (mean)", symbol: "s", min: 0.35, max: 0.65, step: 0.05, value: 0.65},
+  {name: "beta", label: "Communication intensity", symbol: "β", min: 0, max: 1, step: 0.05, value: 0.5},
+  {name: "p_out", label: "Friendships between groups", symbol: "p_out", min: 0, max: 0.1, step: 0.005, value: 0.01, digits: 3},
 ];
 
 const intParameters = [
-  {name: "T", label: "Число раундов", symbol: "T", min: 20, max: 200, step: 5, value: 60},
-  {name: "t_on", label: "Начало проверок", symbol: "t_on", min: 0, max: 199, step: 1, value: 10},
-  {name: "t_off", label: "Конец проверок", symbol: "t_off", min: 1, max: 200, step: 1, value: 40},
-  {name: "N_groups", label: "Число учебных групп", symbol: "k", min: 2, max: 10, step: 1, value: 6},
-  {name: "group_size", label: "Размер группы", symbol: "n", min: 10, max: 50, step: 5, value: 25},
+  {name: "T", label: "Number of rounds", symbol: "T", min: 20, max: 200, step: 5, value: 60},
+  {name: "t_on", label: "Start of verification", symbol: "t_on", min: 0, max: 199, step: 1, value: 10},
+  {name: "t_off", label: "End of verification", symbol: "t_off", min: 1, max: 200, step: 1, value: 40},
+  {name: "N_groups", label: "Number of study groups", symbol: "k", min: 2, max: 10, step: 1, value: 6},
+  {name: "group_size", label: "Group size", symbol: "n", min: 10, max: 50, step: 5, value: 25},
 ];
 
 function canvasSize(canvas) {
@@ -266,11 +267,11 @@ function h2Draw(canvas, snap, ens) {
   }
   font(ctx, 10, 650);
   ctx.textAlign = "center"; ctx.textBaseline = "top";
-  ctx.fillText("покрытие r", (plot.left + plot.right) / 2, plot.bottom + 23);
+  ctx.fillText("coverage r", (plot.left + plot.right) / 2, plot.bottom + 23);
   ctx.save();
   ctx.translate(14, (plot.top + plot.bottom) / 2);
   ctx.rotate(-Math.PI / 2);
-  ctx.fillText("строгость σ", 0, 0);
+  ctx.fillText("strictness σ", 0, 0);
   ctx.restore();
 }
 
@@ -306,7 +307,7 @@ function ensembleDraw(canvas, snap, ens) {
   if (!ens?.bands) {
     font(ctx, 12, 650);
     ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = "#8a93a5";
-    ctx.fillText("Ансамбль пересчитывается…", (f.plot.left + f.plot.right) / 2, f.plot.top + 24);
+    ctx.fillText("Recalculating ensemble…", (f.plot.left + f.plot.right) / 2, f.plot.top + 24);
   }
 }
 
@@ -346,93 +347,93 @@ function template() {
     <div class="td-topbar">
       <div class="td-brand">
         <div class="td-logo">◈</div>
-        <div><div class="td-kicker">АГЕНТНОЕ МОДЕЛИРОВАНИЕ · MESA</div>
-          <h1>Доверяй, но проверяй</h1>
-          <div class="td-subtitle">Как проверки преподавателя меняют отношение студентов к ИИ</div>
+        <div><div class="td-kicker">AGENT-BASED MODELING · MESA</div>
+          <h1>Trust, but Verify</h1>
+          <div class="td-subtitle">How teacher verification changes students’ attitudes toward AI</div>
         </div>
       </div>
-      <div class="td-top-right"><div class="td-run-status" data-status>Готово к запуску</div><div class="td-counter">Раунд <strong data-step>0</strong> <span data-limit>/ 60</span></div></div>
+      <div class="td-top-right"><div class="td-run-status" data-status>Ready to start</div><div class="td-counter">Round <strong data-step>0</strong> <span data-limit>/ 60</span></div></div>
     </div>
 
     <div class="td-layout">
       <aside class="td-sidebar">
         <section class="td-card td-controls">
-          <div class="td-card-head"><h2>Управление моделью</h2><p>Запуск, пауза и переходы по раундам</p></div>
+          <div class="td-card-head"><h2>Model Controls</h2><p>Start, pause, and navigate through rounds</p></div>
           <div class="td-settings">
-            <label class="td-label" for="td-scenario">Сценарий</label>
+            <label class="td-label" for="td-scenario">Scenario</label>
             <select id="td-scenario" data-scenario>
-              <option value="0. Контроль">0 · Контроль</option>
-              <option value="1. Преподаватель" selected>1 · Преподаватель (проверки)</option>
+              <option value="0. Контроль">0 · Control</option>
+              <option value="1. Преподаватель" selected>1 · Teacher (verification)</option>
             </select>
-            <div class="td-actions-primary"><button class="td-btn td-btn-primary" type="button" data-play>▶ Пуск</button><button class="td-btn td-btn-soft" type="button" data-reset>↺ Сброс</button></div>
-            <div class="td-actions-secondary"><button class="td-btn td-btn-outline" type="button" data-step-one>Шаг +1</button><button class="td-btn td-btn-outline" type="button" data-step-ten>Шаг +10</button></div>
-            <div class="td-speed"><div class="td-param-label"><span>Скорость воспроизведения</span><output data-speed-output>600 мс</output></div><input data-speed type="range" min="150" max="1800" step="50" value="600"></div>
-            <div class="td-speed"><div class="td-param-label"><span>Ансамбль: прогонов на сценарий</span><output data-ens-r-output>40</output></div><input data-ens-r type="range" min="20" max="200" step="10" value="40">
-              <label class="td-check"><input type="checkbox" data-ens-auto checked> Пересчитывать после «Применить» и «Сброс»</label>
-              <button class="td-btn td-btn-outline td-btn-wide" type="button" data-ens-run>↻ Пересчитать ансамбль</button>
+            <div class="td-actions-primary"><button class="td-btn td-btn-primary" type="button" data-play>▶ Start</button><button class="td-btn td-btn-soft" type="button" data-reset>↺ Reset</button></div>
+            <div class="td-actions-secondary"><button class="td-btn td-btn-outline" type="button" data-step-one>Step +1</button><button class="td-btn td-btn-outline" type="button" data-step-ten>Step +10</button></div>
+            <div class="td-speed"><div class="td-param-label"><span>Playback speed</span><output data-speed-output>600 ms</output></div><input data-speed type="range" min="150" max="1800" step="50" value="600"></div>
+            <div class="td-speed"><div class="td-param-label"><span>Ensemble: runs per scenario</span><output data-ens-r-output>40</output></div><input data-ens-r type="range" min="20" max="200" step="10" value="40">
+              <label class="td-check"><input type="checkbox" data-ens-auto checked> Recalculate after "Apply" and "Reset"</label>
+              <button class="td-btn td-btn-outline td-btn-wide" type="button" data-ens-run>↻ Recalculate Ensemble</button>
             </div>
           </div>
         </section>
         <section class="td-card td-params">
-          <div class="td-card-head td-params-head"><h2>Параметры</h2><p>Изменения применяются при новом запуске</p></div>
+          <div class="td-card-head td-params-head"><h2>Parameters</h2><p>Changes take effect on a new run</p></div>
           <div class="td-params-inner">${paramHTML}</div>
         </section>
         <section class="td-card td-params">
-          <div class="td-card-head td-params-head"><h2>Время и сеть</h2><p>Раунды, период проверок, учебные группы</p></div>
+          <div class="td-card-head td-params-head"><h2>Time and Network</h2><p>Rounds, verification period, study groups</p></div>
           <div class="td-params-inner">${intParamHTML}
             <div class="td-seed"><label for="td-seed">Seed</label><input id="td-seed" type="number" data-seed min="0" max="99999" value="0"></div>
-            <button class="td-btn td-btn-apply" type="button" data-apply disabled>Применить параметры</button>
+            <button class="td-btn td-btn-apply" type="button" data-apply disabled>Apply Parameters</button>
           </div>
         </section>
       </aside>
 
       <main class="td-main">
         <div class="td-metrics">
-          <div class="td-stat td-stat-a"><div class="td-stat-name">Не доверяют <span>L</span></div><strong data-metric-l>—</strong><div class="td-stat-tip">Не используют ИИ</div></div>
-          <div class="td-stat td-stat-b"><div class="td-stat-name">Доверяют и проверяют <span>M</span></div><strong data-metric-m>—</strong><div class="td-stat-tip">Целевое состояние</div></div>
-          <div class="td-stat td-stat-c"><div class="td-stat-name">Без проверки <span>H</span></div><strong data-metric-h>—</strong><div class="td-stat-tip">Используют без проверки</div></div>
-          <div class="td-stat td-stat-d"><div class="td-stat-name">Разброс групп <span>sd</span></div><strong data-metric-sd>—</strong><div class="td-stat-tip">sd доли M между группами</div></div>
+          <div class="td-stat td-stat-a"><div class="td-stat-name">Do Not Trust <span>L</span></div><strong data-metric-l>—</strong><div class="td-stat-tip">Do not use AI</div></div>
+          <div class="td-stat td-stat-b"><div class="td-stat-name">Trust and Verify <span>M</span></div><strong data-metric-m>—</strong><div class="td-stat-tip">Target state</div></div>
+          <div class="td-stat td-stat-c"><div class="td-stat-name">Without Verification <span>H</span></div><strong data-metric-h>—</strong><div class="td-stat-tip">Use AI without verification</div></div>
+          <div class="td-stat td-stat-d"><div class="td-stat-name">Variation Across Groups <span>sd</span></div><strong data-metric-sd>—</strong><div class="td-stat-tip">SD of M proportions across groups</div></div>
         </div>
 
         <div class="td-viz-grid">
-          ${vizCard("Социальная сеть студентов", "<span data-net-sub>6 учебных групп · 150 агентов</span>", "data-network",
-                    "Состояния студентов в социальной сети",
-                    `<span>${dot(palette[-1])}Не доверяют</span><span>${dot(palette[0])}Проверяют</span><span>${dot(palette[1])}Без проверки</span>`)}
-          ${vizCard("Динамика состояний", "Доля студентов в каждом состоянии по раундам", "data-chart",
-                    "График долей состояний по раундам",
-                    `<span>${dot(palette[-1])}L</span><span>${dot(palette[0])}M</span><span>${dot(palette[1])}H</span><span data-expected-legend>${dash(palette[0], "dotted")}Ожидание M</span><span data-band-legend><i class="td-band-key"></i>Период проверок</span>`)}
-          ${vizCard("H3 · Проверяющие по учебным группам", "Каждая тонкая линия — одна группа текущего прогона", "data-groups",
-                    "Доля проверяющих по учебным группам",
-                    `<span>${dot("rgba(21,155,131,.6)")}Учебная группа</span><span>${dot("#1f3150")}Вся сеть</span><span data-band-legend><i class="td-band-key"></i>Период проверок</span>`)}
-          ${vizCard("H1 · Проверяющие и надежность ИИ", "Равновесная доля M при постоянных проверках (расчет без общения)", "data-h1",
-                    "Равновесная доля проверяющих в зависимости от ошибки ИИ",
-                    `<span>${dot(palette[0])}<span data-h1-sigma>Текущая σ</span></span><span>${dash(accent.strict)}Строгая σ = 1</span><span>${dot("#ed9257")}Симуляция ± бутстрап</span><span>${dot("#1f3150")}Текущее e</span>`)}
-          ${vizCard("H2 · Покрытие и строгость", "<span data-h2-sub>Ожидаемая доля M к концу проверок</span>", "data-h2",
-                    "Ожидаемая доля проверяющих при разных покрытии и строгости",
-                    `<span><i class="td-band-key" style="background:rgba(21,155,131,.75)"></i>Больше проверяющих</span><span><i class="td-band-key" style="background:#fff;border:2px solid #1f3150"></i>Текущие r и σ</span>`)}
-          ${vizCard("Текущий прогон на фоне ансамбля", "<span data-ens-sub>Ансамбль пересчитывается…</span>", "data-ens",
-                    "Текущий прогон и полосы ансамбля прогонов",
-                    `<span>${dot(palette[0])}Текущий прогон (M)</span><span>${dot("#2f6fb0")}Проверки: среднее</span><span>${dot("#8a93a5")}Контроль: среднее</span><span><i class="td-band-key" style="background:rgba(47,111,176,.35)"></i>Бутстрап 95%</span><span><i class="td-band-key" style="background:rgba(47,111,176,.1)"></i>95% прогонов</span>`)}
+          ${vizCard("Student Social Network", "<span data-net-sub>6 study groups · 150 agents</span>", "data-network",
+                    "Student states in the social network",
+                    `<span>${dot(palette[-1])}Do Not Trust</span><span>${dot(palette[0])}Verify</span><span>${dot(palette[1])}Without Verification</span>`)}
+          ${vizCard("State Dynamics", "Proportion of students in each state by round", "data-chart",
+                    "Chart of state proportions by round",
+                    `<span>${dot(palette[-1])}L</span><span>${dot(palette[0])}M</span><span>${dot(palette[1])}H</span><span data-expected-legend>${dash(palette[0], "dotted")}Expected M</span><span data-band-legend><i class="td-band-key"></i>Verification period</span>`)}
+          ${vizCard("H3 · Verifying Students by Study Group", "Each thin line represents one group in the current run", "data-groups",
+                    "Proportion of verifying students by study group",
+                    `<span>${dot("rgba(21,155,131,.6)")}Study group</span><span>${dot("#1f3150")}Entire network</span><span data-band-legend><i class="td-band-key"></i>Verification period</span>`)}
+          ${vizCard("H1 · Verifying Students and AI Reliability", "Equilibrium proportion M under continuous verification (calculated without communication)", "data-h1",
+                    "Equilibrium proportion of verifying students as a function of AI error probability",
+                    `<span>${dot(palette[0])}<span data-h1-sigma>Current σ</span></span><span>${dash(accent.strict)}Strict σ = 1</span><span>${dot("#ed9257")}Simulation ± bootstrap</span><span>${dot("#1f3150")}Current e</span>`)}
+          ${vizCard("H2 · Coverage and Strictness", "<span data-h2-sub>Expected proportion M at the end of verification</span>", "data-h2",
+                    "Expected proportion of verifying students at different coverage and strictness levels",
+                    `<span><i class="td-band-key" style="background:rgba(21,155,131,.75)"></i>More verifying students</span><span><i class="td-band-key" style="background:#fff;border:2px solid #1f3150"></i>Current r and σ</span>`)}
+          ${vizCard("Current Run Compared with the Ensemble", "<span data-ens-sub>Recalculating ensemble…</span>", "data-ens",
+                    "Current run and ensemble bands",
+                    `<span>${dot(palette[0])}Current run (M)</span><span>${dot("#2f6fb0")}Verification: mean</span><span>${dot("#8a93a5")}Control: mean</span><span><i class="td-band-key" style="background:rgba(47,111,176,.35)"></i>95% bootstrap CI</span><span><i class="td-band-key" style="background:rgba(47,111,176,.1)"></i>95% of runs</span>`)}
           <section class="td-card td-viz-card">
-            <div class="td-card-head"><h2>Сводка по ансамблю (бутстрап)</h2><p data-ens-table-sub>Среднее [95% бутстрап-интервал среднего] · sd между прогонами</p></div>
+            <div class="td-card-head"><h2>Ensemble Summary (Bootstrap)</h2><p data-ens-table-sub>Mean [95% bootstrap CI for the mean] · SD across runs</p></div>
             <div class="td-table-wrap" data-ens-table></div>
           </section>
           <section class="td-card td-viz-card">
-            <div class="td-card-head"><h2>Как читать графики</h2><p>Что проверяет каждая гипотеза</p></div>
+            <div class="td-card-head"><h2>How to Read the Charts</h2><p>What each hypothesis tests</p></div>
             <div class="td-notes">
-              <p><b>RQ.</b> Можно ли проверками увеличить долю студентов, которые пользуются ИИ и проверяют его (M)?</p>
-              <p><b>H1.</b> Доля проверяющих зависит от надежности ИИ: при очень надежном ИИ студенты расслабляются и перестают проверять.</p>
-              <p><b>H2.</b> Строгость σ задает, к какой доле M приходит популяция; покрытие r — как быстро. По строкам меняется предел, по столбцам — скорость.</p>
-              <p><b>H3.</b> После окончания проверок доля M сохраняется, а различия между группами растут.</p>
-              <p><b>Ансамбль.</b> Модель много раз прогоняется с теми же параметрами. Светлая полоса — где лежат 95% отдельных прогонов, темная — 95% бутстрап-интервал среднего.</p>
-              <p class="td-notes-muted">Линии H1 и H2 — расчет по формулам; точки H1 и проценты H2 — симуляция ансамбля. Все пересчитывается для текущих параметров.</p>
+              <p><b>RQ.</b> Can verification increase the proportion of students who use AI and verify its output (M)?</p>
+              <p><b>H1.</b> The proportion of verifying students depends on AI reliability: when AI is very reliable, students relax and stop verifying.</p>
+              <p><b>H2.</b> Strictness σ determines the proportion M toward which the population converges; coverage r determines how quickly. Rows change the limiting level, while columns change the speed.</p>
+              <p><b>H3.</b> After verification ends, the proportion M persists, while differences between groups increase.</p>
+              <p><b>Ensemble.</b> The model is run repeatedly with the same parameters. The lighter band contains 95% of individual runs; the darker band is the 95% bootstrap confidence interval for the mean.</p>
+              <p class="td-notes-muted">H1 and H2 lines are formula-based calculations; H1 points and H2 percentages come from ensemble simulations. Everything is recalculated for the current parameters.</p>
             </div>
           </section>
         </div>
-        <div class="td-footnote"><span data-explanation>Вмешательство включено для выбранного сценария.</span><span>Один раунд — одно синхронное обновление агентов</span></div>
+        <div class="td-footnote"><span data-explanation>The intervention is enabled for the selected scenario.</span><span>One round is one synchronous update of all agents</span></div>
 
         <section class="td-card td-results" data-results>
-          <div class="td-card-head"><h2>Результаты экспериментов</h2><p>Рисунки из experiments.py → figures.py (усреднение по прогонам)</p></div>
+          <div class="td-card-head"><h2>Experiment Results</h2><p>Figures from experiments.py → figures.py (averaged across runs)</p></div>
           <div class="td-tabs" data-tabs></div>
           <div class="td-figure" data-figure></div>
         </section>
@@ -486,17 +487,25 @@ export default {
     function renderEnsembleInfo() {
       const sub = $("[data-ens-sub]"), table = $("[data-ens-table]");
       if (!ensemble.R) {
-        sub.textContent = ensembleRunning ? "Ансамбль пересчитывается…" : "Ансамбль не посчитан для текущих параметров";
-        table.innerHTML = `<p class="td-notes-muted td-pad">${ensembleRunning ? "Считаю прогоны…" : "Нажмите «Пересчитать ансамбль»."}</p>`;
-        $("[data-h2-src]") && ($("[data-h2-src]").textContent = "расчет по формулам");
+        sub.textContent = ensembleRunning ? "Recalculating ensemble…" : "The ensemble has not been calculated for the current parameters";
+        table.innerHTML = `<p class="td-notes-muted td-pad">${ensembleRunning ? "Calculating runs…" : "Click ‘Recalculate Ensemble’."}</p>`;
+        $("[data-h2-src]") && ($("[data-h2-src]").textContent = "formula-based calculation");
         return;
       }
       const pct = snapshot ? percentileOfCurrent(snapshot, ensemble) : null;
-      sub.textContent = `${ensemble.R} прогонов на сценарий · ${ensemble.seconds} с` +
-        (pct === null ? "" : ` · текущий прогон выше, чем ${pct}% прогонов ансамбля на этом шаге`);
+      sub.textContent = `${ensemble.R} runs per scenario · ${ensemble.seconds} s` +
+        (pct === null ? "" : ` · current run is higher than ${pct}% of ensemble runs at this step`);
       $("[data-ens-table-sub]").textContent =
-        `Среднее [95% бутстрап-интервал] · sd между прогонами · R = ${ensemble.R} (H1/H2: ${ensemble.R_grid} на точку)`;
+        `Mean [95% bootstrap CI] · SD across runs · R = ${ensemble.R} (H1/H2: ${ensemble.R_grid} per point)`;
       const metrics = [...new Set(ensemble.summary.map(r => r.metric))];
+      const metricLabels = {
+        "M в конце проверок": "M at the end of verification",
+        "M в конце модели": "M at the end of the simulation",
+        "H в конце проверок": "H at the end of verification",
+        "Изменение M после проверок (H3)": "Change in M after verification (H3)",
+        "Разброс групп в конце проверок": "Variation across groups at the end of verification",
+        "Разброс групп в конце модели": "Variation across groups at the end of the simulation"
+      };
       const scen = ["0. Контроль", "1. Преподаватель"];
       const cell = row => {
         if (!row) return "<td class=\"td-muted\">—</td>";
@@ -504,10 +513,10 @@ export default {
         const f = v => (pctMetric ? fmtPct(v) : (v >= 0 ? "" : "−") + Math.abs(v).toFixed(3));
         return `<td><strong>${f(row.mean)}</strong> <span class="td-ci">[${f(row.ci_lo)}; ${f(row.ci_hi)}]</span><br><span class="td-sd">sd ${row.sd.toFixed(3)}</span></td>`;
       };
-      table.innerHTML = `<table class="td-table"><thead><tr><th>Метрика</th><th>Контроль</th><th>Проверки</th></tr></thead><tbody>` +
-        metrics.map(m => `<tr><th>${m}</th>${scen.map(sc => cell(ensemble.summary.find(r => r.metric === m && r.scenario === sc))).join("")}</tr>`).join("") +
+      table.innerHTML = `<table class="td-table"><thead><tr><th>Metric</th><th>Control</th><th>Verification</th></tr></thead><tbody>` +
+        metrics.map(m => `<tr><th>${metricLabels[m] || m}</th>${scen.map(sc => cell(ensemble.summary.find(r => r.metric === m && r.scenario === sc))).join("")}</tr>`).join("") +
         `</tbody></table>`;
-      $("[data-h2-src]") && ($("[data-h2-src]").textContent = `симуляция, ${ensemble.R_grid} прогонов на клетку`);
+      $("[data-h2-src]") && ($("[data-h2-src]").textContent = `simulation, ${ensemble.R_grid} runs per cell`);
     }
 
     function requestDraw() {
@@ -523,7 +532,7 @@ export default {
     }
 
     function updateButtons() {
-      playButton.textContent = playing ? "❚❚ Пауза" : "▶ Пуск";
+      playButton.textContent = playing ? "❚❚ Pause" : "▶ Start";
       playButton.classList.toggle("td-btn-playing", playing);
       const ended = snapshot && snapshot.step >= snapshot.limit;
       playButton.disabled = false;
@@ -532,7 +541,7 @@ export default {
       applyButton.disabled = !dirty || inFlight;
       ensButton.disabled = inFlight;
       scenarioInput.disabled = inFlight;
-      applyButton.textContent = dirty ? "Применить параметры *" : "Параметры применены";
+      applyButton.textContent = dirty ? "Apply Parameters *" : "Parameters applied";
     }
 
     function readSettings() {
@@ -559,7 +568,7 @@ export default {
     function pause() {
       playing = false;
       clearPlaybackTimer();
-      setStatus("На паузе");
+      setStatus("Paused");
       updateButtons();
     }
 
@@ -567,7 +576,7 @@ export default {
       if (!playing || inFlight || disposed || !snapshot) return;
       if (snapshot.step >= snapshot.limit) {
         playing = false;
-        setStatus("Моделирование завершено");
+        setStatus("Simulation completed");
         updateButtons();
         return;
       }
@@ -584,7 +593,7 @@ export default {
       ensembleRunning = true;
       ensemble = {};
       const ok = publish("ensemble", {R: Number(ensRInput.value)});
-      setStatus(`Считаю ансамбль: ${ensRInput.value} прогонов…`, true);
+      setStatus(`Calculating ensemble: ${ensRInput.value} runs…`, true);
       renderEnsembleInfo();
       requestDraw();
       return ok;
@@ -597,7 +606,7 @@ export default {
       dirty = false;
       needEnsemble = true;
       publish("reset", {settings: readSettings()});
-      setStatus(playing ? "Запуск моделирования" : "Модель сбрасывается", playing);
+      setStatus(playing ? "Starting simulation" : "Resetting model", playing);
       updateButtons();
     }
 
@@ -613,14 +622,14 @@ export default {
       $("[data-metric-m]").textContent = `${Math.round(snapshot.shares[1] * 100)}%`;
       $("[data-metric-h]").textContent = `${Math.round(snapshot.shares[2] * 100)}%`;
       $("[data-metric-sd]").textContent = (snapshot.group_sd ?? 0).toFixed(2);
-      $("[data-net-sub]").textContent = `${snapshot.n_groups} учебных групп · ${snapshot.n_agents} агентов`;
+      $("[data-net-sub]").textContent = `${snapshot.n_groups} study groups · ${snapshot.n_agents} agents`;
       for (const node of $$("[data-band-legend]")) node.style.display = snapshot.intervention ? "inline-flex" : "none";
       $("[data-expected-legend]").style.display = snapshot.expected?.length ? "inline-flex" : "none";
-      if (snapshot.h1) $("[data-h1-sigma]").textContent = `Текущая σ = ${snapshot.h1.sigma.toFixed(2)}`;
-      if (snapshot.h2) $("[data-h2-sub]").innerHTML = `Доля M к раунду ${snapshot.h2.t_off} (конец проверок) · <span data-h2-src>расчет по формулам</span>`;
+      if (snapshot.h1) $("[data-h1-sigma]").textContent = `Current σ = ${snapshot.h1.sigma.toFixed(2)}`;
+      if (snapshot.h2) $("[data-h2-sub]").innerHTML = `Proportion M by round ${snapshot.h2.t_off} (end of verification) · <span data-h2-src>formula-based calculation</span>`;
       $("[data-explanation]").textContent = snapshot.intervention
-        ? `Период проверок: раунды ${snapshot.t_on}–${snapshot.t_off}.`
-        : "Контрольная группа: без проверок и без затененной области.";
+        ? `Verification period: rounds ${snapshot.t_on}–${snapshot.t_off}.`
+        : "Control group: no verification and no shaded area.";
       scenarioInput.value = snapshot.scenario;
       ensemble = model.get("ensemble") || {};
       if (ensemble.R) ensembleRunning = false;
@@ -632,14 +641,14 @@ export default {
         return;
       }
       if (playing) {
-        setStatus("Воспроизведение", true);
+        setStatus("Playing", true);
         scheduleNext();
       } else if (snapshot.step >= snapshot.limit) {
-        setStatus("Моделирование завершено");
+        setStatus("Simulation completed");
       } else if (snapshot.step === 0) {
-        setStatus("Готово к запуску");
+        setStatus("Ready to start");
       } else {
-        setStatus("На паузе");
+        setStatus("Paused");
       }
       updateButtons();
     }
@@ -649,7 +658,7 @@ export default {
       const tabs = $("[data-tabs]"), holder = $("[data-figure]");
       if (!figures.length) {
         tabs.innerHTML = "";
-        holder.innerHTML = `<p class="td-notes-muted">Рисунки появятся после запуска <code>python run_all.py</code>.</p>`;
+        holder.innerHTML = `<p class="td-notes-muted">Figures will appear after running <code>python run_all.py</code>.</p>`;
         return;
       }
       tabs.innerHTML = figures.map((f, i) =>
@@ -677,7 +686,7 @@ export default {
         return;
       }
       playing = true;
-      setStatus("Воспроизведение", true);
+      setStatus("Playing", true);
       updateButtons();
       scheduleNext();
     });
@@ -711,7 +720,7 @@ export default {
     ensRInput.addEventListener("input", () => { $("[data-ens-r-output]").textContent = ensRInput.value; });
     ensButton.addEventListener("click", () => { pause(); runEnsemble(); });
     speedInput.addEventListener("input", () => {
-      $("[data-speed-output]").textContent = `${speedInput.value} мс`;
+      $("[data-speed-output]").textContent = `${speedInput.value} ms`;
       if (playing && !inFlight) scheduleNext();
     });
 
