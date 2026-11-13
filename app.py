@@ -1,6 +1,6 @@
-"""Интерактивный Mesa дашборд.
+"""Interactive Mesa dashboard.
 
-Запуск:
+Run:
     python -m pip install -r requirements.txt
     solara run app.py
 """
@@ -39,13 +39,13 @@ INT_BOUNDS = {
 }
 
 EXPERIMENT_FIGURES = (
-    ("RQ · Контроль и проверки", "E1_scenarios.png"),
-    ("H1 · Надежность ИИ", "H1_error_rate.png"),
-    ("H2 · Покрытие и строгость", "H2_coverage_strictness.png"),
-    ("H3 · Устойчивость", "H3_persistence.png"),
-    ("Чувствительность", "S_sensitivity.png"),
-    ("Разброс прогонов (бутстрап)", "B_bootstrap.png"),
-    ("Сеть (seed 0)", "network.png"),
+    ("RQ · Control and Verification", "E1_scenarios.png"),
+    ("H1 · AI Reliability", "H1_error_rate.png"),
+    ("H2 · Coverage and Strictness", "H2_coverage_strictness.png"),
+    ("H3 · Persistence", "H3_persistence.png"),
+    ("Sensitivity", "S_sensitivity.png"),
+    ("Variation Across Runs (Bootstrap)", "B_bootstrap.png"),
+    ("Network (seed 0)", "network.png"),
 )
 H2_R = (0.05, 0.1, 0.2, 0.3, 0.5)
 H2_SIGMA = (0.1, 0.25, 0.5, 0.75, 1.0)
@@ -86,7 +86,7 @@ def _safe_settings(raw):
 
 
 def _hypothesis_panels(p):
-    """Графики гипотез для текущих параметров (среднеполевой расчет, без общения)."""
+    """Hypothesis plots for the current parameters (mean-field calculation, without communication)."""
     grid = [round(x, 3) for x in np.linspace(0.05, 0.95, 19)]
     h1 = {
         "grid": grid,
