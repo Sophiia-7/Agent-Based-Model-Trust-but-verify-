@@ -95,7 +95,6 @@
  .td-footnote {flex-wrap:wrap;}
  .td-topbar h1 {font-size:21px;}
 }
-/* Вариант 3: графики гипотез, пояснения и рисунки экспериментов (в том же стиле). */
 .td-legend .td-line-key {width:16px;height:0;border-radius:0;background:none;flex:0 0 16px;}
 .td-notes {padding:12px 18px 16px;font-size:12px;color:#5e6c81;line-height:1.55;flex:1;}
 .td-notes p {margin:0 0 9px;}
@@ -111,7 +110,6 @@
 .td-figure {padding:10px 18px 18px;}
 .td-figure img {display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line);background:#fff;}
 .td-figure code {background:#eef2f8;border-radius:5px;padding:1px 5px;}
-/* Ансамбль прогонов */
 .td-check {display:flex;align-items:center;gap:7px;font-size:11px;color:#5e6c81;margin:9px 0 0;cursor:pointer;}
 .td-check input {accent-color:#286d96;margin:0;}
 .td-btn-wide {width:100%;margin-top:10px;}
