@@ -1,9 +1,66 @@
 # Trust, but Verify — An Interactive Mesa Model
+The application uses [Mesa](https://github.com/mesa/mesa?ysclid=mwfeakarx3112063774) and [Solara](https://github.com/widgetti/solara?ysclid=mwfebic4lg60649934).
+## About the Model
+With the development of large language models (LLMs), artificial intelligence (AI) assistants have become an everyday tool for students. Therefore, universities face an important challenge: how to organize the use of AI in education. The project authors suggest that universities should encourage students to both trust and critically evaluate AI results. They argue that a complete ban on AI assistants would only lead students to use them secretly. 
 
-The application uses Mesa + Solara.
+We propose an agent-based model to explore how the structure of students' social networks and teachers' assessment practices affect the proportion of students who both trust AI and check its answers. The model also helps to understand how teachers' checks influence students' attitudes towards AI.
+
+The model includes students as agents, where $i = 1, \ldots, N$ and $N = nk$. Here, $k$ is the number of study groups, and $n$ is the number of students in each group. In the basic configuration, $k = 6$, $n = 25$, and $N = 150$.
+
+The environment includes a network of friendships, an AI tool with a fixed probability of making errors, and a teacher who checks students' work. The teacher and AI are not separate agents because their behavior is defined by fixed model parameters.
+
+Each student can be in one of three states:
+
+| State | Description |
+|---|---|
+| -1 | Does not trust or use AI |
+| 0 | Trusts AI and checks its answers |
+| +1 | Trusts AI without checking its answers |
+
+The model uses the following parameters.
+
+### Individual Student Parameters
+
+| Parameter | Description |
+|---|---|
+| Knowledge level | Probability of completing a task correctly without AI or detecting an AI error |
+| Conformity | How strongly a student is influenced by friends |
+| Tendency to relax | Probability of stopping AI checks after receiving a good grade |
+| Sensitivity to AI failure | Probability of rejecting AI after receiving a bad grade |
+
+### Main Model Parameters
+
+| Parameter | Default value | Description |
+|---|---|---|
+| AI error probability | 0.45 | Probability that AI gives an incorrect answer |
+| Check coverage | 0.20 | Proportion of student assignments checked by the teacher |
+| Check strictness | 1.00 | Probability that the teacher detects an actual error |
+| Reaction to a bad grade (-1) | 0.40 | Probability that a student who does not use AI starts using it with verification |
+| Reaction to a bad grade (+1) | 0.60 | Probability that a student who blindly trusts AI starts checking its answers |
+| Average tendency to relax | 0.15 | Average probability of stopping verification after a good grade |
+| Average sensitivity to AI failure | 0.30 | Average probability of rejecting AI after a bad grade |
+| Average knowledge level | 0.65 | Average level of students' ability |
+| Social influence | 0.50 | Intensity of discussions about AI between friends |
+| Study groups | 6 | Number of student groups |
+| Students per group | 25 | Number of students in each group |
+| Friendship probability (within groups) | 0.25 | Probability of a friendship between students in the same group |
+| Friendship probability (between groups) | 0.01 | Probability of a friendship between students from different groups |
+| Simulation rounds | 60 | Total number of rounds |
+| Teacher checks | Rounds 10–39 | Period when teachers check assignments |
+
+The initial proportions of students in states -1, 0, and +1 are 0.30, 0.20, and 0.50, respectively.
+
+## About the Research
+
+It is important to note that the we do not experiment with the network structure in their main study. Instead, we use default values that roughly represent the organization of student groups at HSE University, where a study program may include around 150 students. These values are assumptions rather than estimates based on real data.
+
+We conduct experiments with different settings for teacher checks. Their results show that teacher checks can increase the proportion of students who both trust AI and verify its answers. In the basic configuration, this proportion increases from approximately 19% to 50%.
+
+However, the effect depends on how carefully teachers check assignments and how reliable AI is. The results suggest that it is better for teachers to carefully check fewer assignments than to check more assignments without paying enough attention to errors.
+
+In your own research, you can use this model to conduct new experiments with different parameters and obtain your own results. In particular, it would be interesting to explore how changes in the students' social network affect their attitudes towards AI.
 
 ## Running in PyCharm
-
 Open the built-in Terminal in the project directory containing `app.py`, `mesa_model.py`, `model.py`, `dashboard.js`, and `dashboard.css`.
 
 ```bash
@@ -58,3 +115,15 @@ The gray shaded region appears on the plots only in the scenario with checks.
 - `experiments.py`, `figures.py`, `network_viz.py`, `run_all.py` — experiments and figures.
 
 All state changes are performed through the Python `TrustModel` instance. JavaScript is responsible only for rendering and sequentially sending commands during automatic execution. Each subsequent step begins only after the previous one has been acknowledged, with no parallel calls to the model.
+
+## Terms of Use
+
+When using this model or the results of this research, please cite the authors:
+
+- **Viktoriia Beliavskaia** — HSE University
+- **Sofia Buyanova** — HSE University
+- **Karina Galimnurova** — HSE University
+
+## Acknowledgements
+
+We would also like to express our gratitude to **Andrey S. Akhremenko**, Professor at the Faculty of Social Sciences, HSE University, for reviewing our research and model.
