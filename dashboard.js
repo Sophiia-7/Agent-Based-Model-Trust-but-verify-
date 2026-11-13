@@ -283,7 +283,7 @@ function ensembleDraw(canvas, snap, ens) {
   const f = frame(ctx, w, h, {xmin: 0, xmax: limit, xticks: timeTicks(limit)});
   shadeIntervention(ctx, snap, f);
   if (ens?.bands) {
-    const colors = {"0. Контроль": [138, 147, 165], "1. Преподаватель": [47, 111, 176]};
+    const colors = {"0. Control": [138, 147, 165], "1. Teacher": [47, 111, 176]};
     for (const [name, b] of Object.entries(ens.bands)) {
       const [r, g, bl] = colors[name] || [120, 120, 120];
       const xs = b.mean.map((_, t) => t);
@@ -362,8 +362,8 @@ function template() {
           <div class="td-settings">
             <label class="td-label" for="td-scenario">Scenario</label>
             <select id="td-scenario" data-scenario>
-              <option value="0. Контроль">0 · Control</option>
-              <option value="1. Преподаватель" selected>1 · Teacher (verification)</option>
+              <option value="0. Control">0 · Control</option>
+              <option value="1. Teacher" selected>1 · Teacher (verification)</option>
             </select>
             <div class="td-actions-primary"><button class="td-btn td-btn-primary" type="button" data-play>▶ Start</button><button class="td-btn td-btn-soft" type="button" data-reset>↺ Reset</button></div>
             <div class="td-actions-secondary"><button class="td-btn td-btn-outline" type="button" data-step-one>Step +1</button><button class="td-btn td-btn-outline" type="button" data-step-ten>Step +10</button></div>
@@ -499,17 +499,17 @@ export default {
         `Mean [95% bootstrap CI] · SD across runs · R = ${ensemble.R} (H1/H2: ${ensemble.R_grid} per point)`;
       const metrics = [...new Set(ensemble.summary.map(r => r.metric))];
       const metricLabels = {
-        "M в конце проверок": "M at the end of verification",
-        "M в конце модели": "M at the end of the simulation",
-        "H в конце проверок": "H at the end of verification",
-        "Изменение M после проверок (H3)": "Change in M after verification (H3)",
-        "Разброс групп в конце проверок": "Variation across groups at the end of verification",
-        "Разброс групп в конце модели": "Variation across groups at the end of the simulation"
+        "M at the end of verification": "M at the end of verification",
+        "M at the end of the simulation": "M at the end of the simulation",
+        "H at the end of verification": "H at the end of verification",
+        "Change in M after verification (H3)": "Change in M after verification (H3)",
+        "Variation across groups at the end of verification": "Variation across groups at the end of verification",
+        "Variation across groups at the end of the simulation": "Variation across groups at the end of the simulation"
       };
-      const scen = ["0. Контроль", "1. Преподаватель"];
+      const scen = ["0. Control", "1. Teacher"];
       const cell = row => {
         if (!row) return "<td class=\"td-muted\">—</td>";
-        const pctMetric = !row.metric.startsWith("Разброс") && !row.metric.startsWith("Изменение");
+        const pctMetric = !row.metric.startsWith("Variation") && !row.metric.startsWith("Change");
         const f = v => (pctMetric ? fmtPct(v) : (v >= 0 ? "" : "−") + Math.abs(v).toFixed(3));
         return `<td><strong>${f(row.mean)}</strong> <span class="td-ci">[${f(row.ci_lo)}; ${f(row.ci_hi)}]</span><br><span class="td-sd">sd ${row.sd.toFixed(3)}</span></td>`;
       };
